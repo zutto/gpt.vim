@@ -125,7 +125,7 @@ function! gpt#send(text, model) abort
 
 
     let l:yanked_text = s:get_visual_selection()
-    let l:lines = [a:text, l:yanked_text]   
+    let l:lines = join([a:text, l:yanked_text], "")
     
     
     if !exists('s:job') || s:job_status(s:job) !=# 'run'
