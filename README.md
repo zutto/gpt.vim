@@ -53,8 +53,10 @@ Example of the expected output stream from the application:
 mattn's project was an inspiration for this project. This is basically a personal rewrite of the original project: [github.com/mattn/vim-chatgpt](https://github.com/mattn/vim-chatgpt). Give mattn all the love.
 
 ## Demo
-
+normal usage
 [![asciicast](https://asciinema.org/a/81jVCwHdEmEBSv00Lm71WHazk.svg)](https://asciinema.org/a/81jVCwHdEmEBSv00Lm71WHazk)
 
+
+Example of using visual mode.
 [![asciicast](https://asciinema.org/a/PVKHKSRIYOm7mvohAnCDIuDgB.svg)](https://asciinema.org/a/PVKHKSRIYOm7mvohAnCDIuDgB)
 
