@@ -4,15 +4,15 @@ A plugin for interfacing with general purpose text models, such as openai-chatgp
 
 ## Requirements
 
-An application that accepts a stdin stream of JSON, which is handled. Such an application can be found at [github.com/zutto link here soon](https://github.com/zutto) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
+An application that accepts a stdin stream of JSON, which is handled. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
 
-Example of the JSON stream:
+Example of the JSON stream (all tokens in one chunk. May change in future with longer context support):
 
 ```json
 {"model": "gpt-4", "text":"Hello world", "systemrole":"custom role"}
 ```
 
-Example of the expected output stream from the application:
+Example of the expected output stream from the application (streamed per token, or all tokens + EOF):
 
 ```json
 {"eof": false, "error": "", "text": ""}
