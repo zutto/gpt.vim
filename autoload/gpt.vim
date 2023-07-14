@@ -142,18 +142,21 @@ let s:startcol = -1
 let s:jobcontents = []
 let s:winid = -1
 
-function! s:posTracker() abort
-    let ret = {}
-    let lines = 0
-    call substitute(join(s:jobcontents, ""), "\\n", '\=execute("let lines += 1")', 'g')
-    let ret.line = (lines + s:startline)
 
-    let ret.column = len(split(join(s:jobcontents, "").".", "\n")[-1])
-    if ret.column < 0
-        ret.column = 1
+function! s:posTracker() abort
+    let l:ret = {}
+    let l:lines = count(join(s:jobcontents, ""), "\n")
+    "call substitute(join(s:jobcontents, ""), "\\n", '\=execute("let s:lines = s:lines + 1")', 'g')
+    let l:ret.line = (l:lines + s:startline)
+    echom l:lines
+    let l:ret.column = ((len(split(join(s:jobcontents, "").".", "\n")[-1]) - 1) + s:startcol) - 1
+    if l:ret.column < 0
+        let l:ret.column = 1
     endif
 
-    return ret
+    echom s:jobcontents
+    echom l:ret
+    return l:ret
 endfunction
 
 
@@ -180,10 +183,10 @@ function! s:streamPrinter(ch, contents) abort
  
 
     if l:msg["eof"]
-        call win_execute(s:winid, printf('%dnormal! %d|a%s', l:pos["line"], l:pos["column"], "\n"), 0)
         let s:printjob = -1
         let s:startline = -1
         let s:startcol = -1
+        unlet s:jobcontents
         let s:jobcontents = []
         let s:winid = -1
         return
@@ -193,10 +196,11 @@ function! s:streamPrinter(ch, contents) abort
 
 
     let l:lines = len(split(join(s:jobcontents), "\n"))
-    
+   
+
     let l:pos = s:posTracker()
-    call win_execute(s:winid, printf('%dnormal! %d|a%s', l:pos["line"], l:pos["column"], l:msg["text"]), 0)
-    call win_execute(s:winid, "redraw")
+    call win_execute(s:winid, printf('%dnormal! %d|a%s', l:pos["line"], l:pos["column"], l:msg["text"]), 1)
+    call win_execute(s:winid, "redraw", 1)
     
     call add(s:jobcontents, l:msg["text"])
 endfunction
@@ -250,7 +254,7 @@ function! gpt#complete(text, model) abort
     let [line_start, column_start] = getpos("'<")[1:2]
     let [line_end, column_end] = getpos("'>")[1:2]
     let l:yanked_text = s:get_visual_selection()
-    let l:content = join([a:text,"#######", join([l:yanked_text], "\n")], "\n")
+    let l:content = join([a:text, join([l:yanked_text], "\n")], "\n")
     
     "[0] = line [1] = column
     let s:winid = bufwinid('%')
@@ -262,15 +266,15 @@ function! gpt#complete(text, model) abort
     "destroy before beginning
     
 
-    let lines = getline(line_start, line_end)
-
-    if len(lines) == 0 
+    let lines = max([line_start, line_end]) - min([line_start, line_end])
+    if lines < 1 
         if column_start != column_end
-            call win_execute(s:winid, "'<,'>d", 1)
+            call win_execute(s:winid, "normal! gvd", 1)
         endif
         " no auto completion, just insertion
     else
-        call win_execute(s:winid, "'<,'>d", 1)
+        "call win_execute(s:winid, "'<,'>d | put! =''", 1)
+        call win_execute(s:winid, "'<,'>d | put! =''", 1)
 
     endif
    
@@ -284,7 +288,6 @@ function! gpt#complete(text, model) abort
 
     call s:send_raw(l:ch, printf("%s\n", json_encode({'model': a:model, 'text': l:content, 'role': l:role, "session": "completion"})))
 endfunction
-
 
 "vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), min, max, false, lines);
 "call setline(145, join([join(getline(145,145)), "<- test"], ""))
