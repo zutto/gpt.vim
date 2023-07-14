@@ -11,6 +11,16 @@ Works with vim and neovim.
 * Implement a localai backend as a demo back
 * Implement proper openai backend
 * Tidy the code and remove wonk
+* Reset function for the sessions
+* (MAYBE) option to change session on the fly to enable multiple contexts for the backend.
+* The `Gpt` command is quite wonky but seems useful, needs quite bit of fixing & rewriting.
+
+## Goals
+* vim & neovim compatible codebase
+* small & simple
+* Heavy lifting should be done by the "backend". Openai is not the only player anymore, local & private general purpose language models exist.
+* simple interface with the backends using pipes.
+
 
 ## Requirements
 
