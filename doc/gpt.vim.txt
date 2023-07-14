@@ -6,7 +6,7 @@ REQUIREMENTS 						*gpt.vim-requirements*
 ------------------------------------------------------------------------------
 
 
-An application that accepts stdin stream of json, that is handled.
+An application that accepts stdin stream of json.
 Demo of such application can be found at 
 https://github.com/zutto/python-chatgpt-vimbackend 
 or the original: https://github.com/mattn/chatgpt .

@@ -1,19 +1,26 @@
 # gpt.vim
 
+(unfinished project, you may encounter problems.)
+
+
 A plugin for interfacing with general purpose text models, such as openai-chatgpt, localai, etc.
 Works with vim and neovim.
 
+
+## TODO
+* Implement a localai backend as a demo back
+* Implement proper openai backend
+* Tidy the code and remove wonk
+
 ## Requirements
 
-An application that accepts a stdin stream of JSON, which is handled. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
+An application that accepts a stdin stream of JSON. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
 
 Example of the JSON stream:
 ```
-{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role",
-"session": "<name of session, optional>"}
+{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role", "session": "<name of session, optional>"}
 ```
-Sessions are just different chat sessions, so for completion you could use
-`completion` as session name, for chat just `chat`.
+Sessions are just different chat sessions, so for completion you could use `completion` as session name, for chat just `chat`.
 
 
 
@@ -38,8 +45,7 @@ Example of the output stream expected from the application:
 Reset session (cleans the conversations, resets the underlying chatsession,
 reauthenticates, etc):
 ```
-{"model": "gpt-4", "text":""", "systemrole":"","session": "<optional>",
-"reset"="true"\
+{"model": "gpt-4", "text":""", "systemrole":"","session": "<optional>", "reset"="true"}
 ```
 
 
