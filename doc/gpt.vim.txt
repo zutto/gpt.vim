@@ -7,16 +7,22 @@ REQUIREMENTS 						*gpt.vim-requirements*
 
 
 An application that accepts stdin stream of json, that is handled.
-Such application can be found at *github.com/zutto link here soon* 
-or https://github.com/mattn/chatgpt .
+Demo of such application can be found at 
+https://github.com/zutto/python-chatgpt-vimbackend 
+or the original: https://github.com/mattn/chatgpt .
 
 You can also build your own, very simple piped handling.
 
 
 Example of the JSON stream:
 ```
-{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role"}
+{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role",
+"session": "<name of session, optional>"}
 ```
+Sessions are just different chat sessions, so for completion you could use
+`completion` as session name, for chat just `chat`.
+
+
 
 
 Example of the output stream expected from the application:
@@ -36,6 +42,13 @@ Example of the output stream expected from the application:
 {"eof": true, "error": "", "text": ""}
 ```
 
+Reset session (cleans the conversations, resets the underlying chatsession,
+reauthenticates, etc):
+```
+{"model": "gpt-4", "text":""", "systemrole":"","session": "<optional>",
+"reset"="true"\
+```
+
 
 SETTINGS 						    *gpt.vim-settings*
 ------------------------------------------------------------------------------
@@ -53,8 +66,10 @@ SETTINGS 						    *gpt.vim-settings*
 			as needed.
 			Example:			
 `let g:chatgpt_role = "You are a helpful commit writer who likes to write 
-easy to understand and compact commit messages."``
+easy to understand and compact commit messages."
 
+`g:chatgpt_role_completion` same as the chatgpt_role, but for completion
+requests.
 
 
 COMMANDS 						    *gpt.vim-commands*
@@ -62,6 +77,9 @@ COMMANDS 						    *gpt.vim-commands*
 *Chatgpt* ----- Calls the assistant. Note: You highlight contents with visual 
 		mode. The highlighted contents will be sent to the assistant 
 		along with your request.
+*gpt* --------- Calls the assistant with completion session, using the completion
+	      role. This may be wonky, as this uses chat session for
+              completion. Mainly made for fun.
 
 *ChatgptSetRole* ------ Set a custom role on the fly.
 

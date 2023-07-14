@@ -7,15 +7,19 @@ Works with vim and neovim.
 
 An application that accepts a stdin stream of JSON, which is handled. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
 
-Example of the JSON stream (all tokens in one chunk. May change in future with longer context support):
-
-```json
-{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role"}
+Example of the JSON stream:
 ```
+{"model": "gpt-4", "text":"Hello world", "systemrole":"custom role",
+"session": "<name of session, optional>"}
+```
+Sessions are just different chat sessions, so for completion you could use
+`completion` as session name, for chat just `chat`.
 
-Example of the expected output stream from the application (streamed per token, or all tokens + EOF):
 
-```json
+
+
+Example of the output stream expected from the application:
+```
 {"eof": false, "error": "", "text": ""}
 {"eof": false, "error": "", "text": "Hello"}
 {"eof": false, "error": "", "text": "!"}
@@ -31,6 +35,15 @@ Example of the expected output stream from the application (streamed per token, 
 {"eof": true, "error": "", "text": ""}
 ```
 
+Reset session (cleans the conversations, resets the underlying chatsession,
+reauthenticates, etc):
+```
+{"model": "gpt-4", "text":""", "systemrole":"","session": "<optional>",
+"reset"="true"\
+```
+
+
+
 ## Settings
 
 - `g:chatgpt_bin` - Location of the program this plugin interfaces with. Default value: `['python3.11', '/usr/local/bin/chatgpt']`. Example: 
@@ -42,10 +55,13 @@ Example of the expected output stream from the application (streamed per token, 
   ```vim
   let g:chatgpt_role = "You are a helpful commit writer who likes to write easy to understand and compact commit messages."
   ```
+- `g:chatgpt_role_completion` - same as `g:chatgpt_role` but for completion requests.
 
 ## Commands
 
 - `Chatgpt` - Calls the assistant. Note: You highlight contents with visual mode. The highlighted contents will be sent to the assistant along with your request.
+
+- `Gpt` - Calls the assistant with completion session, using the completion role. This may be wonky, as this uses chat session for completion. Mainly made for fun.
 
 - `ChatgptSetRole` - Set a custom role on the fly.
 
@@ -61,3 +77,7 @@ normal usage
 Example of using visual mode.
 [![asciicast](https://asciinema.org/a/PVKHKSRIYOm7mvohAnCDIuDgB.svg)](https://asciinema.org/a/PVKHKSRIYOm7mvohAnCDIuDgB)
 
+
+
+Gpt command demo
+[![asciicast](https://asciinema.org/a/Bn4VZP9qp2s2BerHj3TUmkiFE.svg)](https://asciinema.org/a/Bn4VZP9qp2s2BerHj3TUmkiFE)
