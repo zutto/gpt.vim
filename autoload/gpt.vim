@@ -67,7 +67,7 @@ endfunction
 " --------------------------
 
 function! s:print(msg) abort
-    if empty(a:msg) || a:msg == "None"
+   if empty(a:msg) || a:msg == "None"
         return
     endif
             
@@ -84,7 +84,7 @@ function! s:print(msg) abort
 
     let l:winid = bufwinid('__gpt__')
     if l:winid < 1
-        silent noautocmd split __gpt__
+        silent noautocmd vsplit __gpt__
         setlocal buftype=nofile bufhidden=wipe noswapfile wrap nonumber signcolumn=no filetype=markdown
         wincmd p
         let l:winid = bufwinid('__gpt__')
@@ -97,6 +97,11 @@ function! s:print(msg) abort
         call win_execute(l:winid, 'silent normal! Go' .. l:msg['error'], 1)
     elseif l:msg['eof']
         call win_execute(l:winid, 'silent normal! Go', 1)
+    elseif !empty(l:msg['notification'])
+        echom printf('notification: %s', l:msg['notification'])
+    fi
+
+ 
     endif
         
     call win_execute(l:winid, 'setlocal nomodifiable nomodified', 1)
@@ -104,6 +109,7 @@ endfunction
 
 function! s:nvim_stdproxy(ch, msg, event) abort
     try
+        "echo a:msg
         for msg in a:msg
             if a:event ==# 'stdout'
                 call s:stdout("", msg)
@@ -123,11 +129,11 @@ function! s:stdout(ch, msg) abort
 endfunction
 
 function! s:stderr(msg) abort
-    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf('[ERROR]>>> %s\n', a:msg)}))
+    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf('[ERROR]>>> %s\n', a:msg), 'notification': ''}))
 endfunction
 
 function! s:stdexit(ch, msg) abort
-    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf('[EXIT]>>> %s\n', a:msg)}))
+    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf('[EXIT]>>> %s\n', a:msg), 'notification': ''}))
 endfunction
 
 
@@ -192,7 +198,9 @@ function! s:streamPrinter(ch, contents) abort
         return
     endif
 
-
+    if l:msg['notification']
+        echom printf('notification: %s', l:msg['notification'])
+    fi
 
 
     let l:lines = len(split(join(s:jobcontents), "\n"))
@@ -226,7 +234,7 @@ endfunction
 " ---------------
 
 function! gpt#send(text, model) abort
-    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> %s\n", a:text) }))
+    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> %s\n", a:text), 'notification': ''}))
 
 
     let l:yanked_text = s:get_visual_selection()
@@ -241,8 +249,9 @@ function! gpt#send(text, model) abort
     endif
 
     let l:role = get(g:, "chatgpt_role", "")
+    let l:model = empty(a:model) ? g:model : a:model
 
-    call s:send_raw(l:ch, printf("%s\n", json_encode({'model': a:model, 'text': l:lines, 'role': l:role, "session": "chat"})))
+    call s:send_raw(l:ch, printf("%s\n", json_encode({'model': l:model, 'text': l:lines, 'role': l:role, "session": "chat"})))
 endfunction
 
 function! gpt#reset() abort
@@ -286,7 +295,8 @@ function! gpt#complete(text, model) abort
 
     let l:role = get(g:, "chatgpt_role_completion", "")
 
-    call s:send_raw(l:ch, printf("%s\n", json_encode({'model': a:model, 'text': l:content, 'role': l:role, "session": "completion"})))
+    let l:model = empty(a:model) ? g:model : a:model
+    call s:send_raw(l:ch, printf("%s\n", json_encode({'model': l:model, 'text': l:content, 'role': l:role, "session": "completion"})))
 endfunction
 
 "vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), min, max, false, lines);
@@ -321,7 +331,7 @@ endfunction
 
 function! gpt#set_role(text) abort
  let g:chatgpt_role = a:text
-  call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> Set role to: %s\n", a:text) })) 
+  call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> Set role to: %s\n", a:text) , 'notification': ''})) 
 endfunction
 
 

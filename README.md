@@ -1,6 +1,6 @@
 # gpt.vim
 
-(unfinished project, you may encounter problems.)
+(unfinished but working project, you may encounter problems.)
 
 
 A plugin for interfacing with general purpose text models, such as openai-chatgpt, localai, etc.
