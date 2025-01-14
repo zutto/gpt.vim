@@ -24,7 +24,7 @@ Works with vim and neovim.
 
 ## Requirements
 
-An application that accepts a stdin stream of JSON. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend) or [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt). You can also build your own simple piped handling.
+An application that accepts a stdin stream of JSON. Such an application can be found at [github.com/zutto/python-chatgpt-vimbackend (WIP)](https://github.com/zutto/python-chatgpt-vimbackend), [github.com/mattn/chatgpt](https://github.com/mattn/chatgpt) or [sample bash backend](https://github.com/zutto/gpt.vim/tree/main/sample_bash_backend). You can also build your own simple piped handling.
 
 Example of the JSON stream:
 ```
