@@ -1,0 +1,77 @@
+#!/bin/bash
+API_URL="https://12.34.56.78:11434/api/chat" # ollama API url - open_webui api works too.
+API_KEY="sk-d31diipadaapa" # api key, not needed on local installations
+
+###
+## models - configure these.
+###
+DECISION_MODEL="qwen2.5:3b"         # model used to decide which model to use
+FALLBACK_MODEL="hermes3:3b"         # fallback model if nothing else
+FAST_MODEL="hermes3:3b"             # fast conversation model - not for coding
+SLOW_MODEL="mixtral:8x7b"           # slow conversation model - not for coding.
+FAST_CODE_MODEL="qwen2.5-coder:14b" # fast model for code
+SLOW_CODE_MODEL="qwen2.5-coder:32b" # slow model for code 
+
+
+
+#
+#
+#
+
+
+
+while IFS= read -r line; do
+	og="${line}"
+	line=$(echo -E "${line}" | jq -c '{temperature: 0.3, stream: true, model: .model, messages: [{role: "system", content: (.role // "")},{role: "user", content: (.text // "" | @json), session: .session}]}') #| awk '{printf "%s\\n", $0}' | head -c -2)
+#	line=$(echo -n "${line}" | jq -c '{temperature: 0.3, stream: true, model: .model, messages: [{role: "system", content: (.role // "")},{role: "user", content: (.text // "")}],session: .session}')
+    if echo "${line}" | jq -c 'select(.model == "smart")' 2>&1 >> /dev/null; then
+	text=$(echo -n "${og}"|jq -c -r ".text | @json")
+        modelChooser=$(curl -X POST "${API_URL}" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: bearer ${API_KEY}" \
+        -s \
+        -d "$(cat <<EOT
+{
+    "model": "${DECISION_MODEL}", 
+    "messages": [{"role": "system", "content":"Identify is the following user messages type, remember to be reasonable and analytical when deciding.\n-\"quick\" for quick general chit-chatting or random conversations.\n-\"slow\" for questions that are more than just chit-chatting.\n-\"code\" for tech/coding related questions.\n-\"complex-code\" for very compliacted code questions."}, {"role": "user", "content": ${text}}],
+    "stream": false,
+    "options": {"temperature": 0.1},
+    "format": {
+	"type": "object",
+	"properties": {
+	    "type": { 
+		    "enum": ["quick", "slow", "code", "complex-code"],
+		    "type": "string"
+		    }
+	}
+    },
+    "required": ["messageType"]
+}
+EOT
+)"| jq -r '.message.content | fromjson | .type');
+        model="$(echo "${og}"| awk '{printf "%s\\n", $0}' | head -c -2| jq -j .model)"
+        if [[ ${modelChooser} == "quick" ]]; then
+            model="${FAST_MODEL}"
+        elif [[ ${modelChooser} == "slow" ]]; then
+            model="${SLOW_MODEL}"
+        elif [[ ${modelChooser} == "code" ]]; then
+            model="${FAST_CODE_MODEL}"
+        elif [[ ${modelChooser} == "complex-code" ]]; then
+            model="${SLOW_CODE_MODEL}"
+        else
+            model="${FALLBACK_MODEL}"
+        fi
+	echo '{"eof": false, "error": "", "text": "", "notification": "chose model: '"${model}"'"}'
+        line=$(echo -n "${line}" | jq -r -c '.model = '"\"${model}\"")
+	
+    fi
+	curl --no-buffer -X POST "${API_URL}" \
+	-H "Content-Type: application/json" \
+        -H "Authorization: bearer ${API_KEY}" \
+	-d "$(cat <<EOT
+${line}
+EOT
+)" -s \
+	| awk '{gsub(/data: /, ""); gsub(/\[DONE\]/, ""); print; fflush()}' \
+	| jq --unbuffered -r -c '{ eof: (.done != false), error: "", text: (.message.content // ""), notification: ""}'
+done < <(cat)

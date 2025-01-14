@@ -37,19 +37,19 @@ Sessions are just different chat sessions, so for completion you could use `comp
 
 Example of the output stream expected from the application:
 ```
-{"eof": false, "error": "", "text": ""}
-{"eof": false, "error": "", "text": "Hello"}
-{"eof": false, "error": "", "text": "!"}
-{"eof": false, "error": "", "text": " How"}
-{"eof": false, "error": "", "text": " can"}
-{"eof": false, "error": "", "text": " I"}
-{"eof": false, "error": "", "text": " assist"}
-{"eof": false, "error": "", "text": " you"}
-{"eof": false, "error": "", "text": " today"}
-{"eof": false, "error": "", "text": "?"}
-{"eof": false, "error": "", "text": ""}
-{"eof": false, "error": "", "text": ""}
-{"eof": true, "error": "", "text": ""}
+{"eof": false, "error": "", "text": "", notification: ""}
+{"eof": false, "error": "", "text": "Hello", notification: ""}
+{"eof": false, "error": "", "text": "!", notification: ""}
+{"eof": false, "error": "", "text": " How", notification: ""}
+{"eof": false, "error": "", "text": " can", notification: ""}
+{"eof": false, "error": "", "text": " I", notification: ""}
+{"eof": false, "error": "", "text": " assist", notification: ""}
+{"eof": false, "error": "", "text": " you", notification: ""}
+{"eof": false, "error": "", "text": " today", notification: ""}
+{"eof": false, "error": "", "text": "?", notification: ""}
+{"eof": false, "error": "", "text": "", notification: ""}
+{"eof": false, "error": "", "text": "", notification: ""}
+{"eof": true, "error": "", "text": "", notification: ""}
 ```
 
 Reset session (cleans the conversations, resets the underlying chatsession,
