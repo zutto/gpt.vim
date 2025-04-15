@@ -233,13 +233,23 @@ endfunction
 " vim interface
 " ---------------
 
-function! gpt#send(text, model) abort
-    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> %s\n", a:text), 'notification': ''}))
+function! gpt#send(range, text, model) abort
 
 
-    let l:yanked_text = s:get_visual_selection()
-    "let l:lines = join([a:text, join(['```', l:yanked_text, "```"], "\n")], "\n")
-    let l:lines = join([a:text, join([l:yanked_text], "\n")], "\n")
+    if a:range > 0
+        let l:yanked_text = s:get_visual_selection()
+
+        if !empty(l:yanked_text)
+            let l:yanked_text = join(['Context:', '```', l:yanked_text, "```"], "\n")
+            "let l:lines = join([a:text, join(['```', l:yanked_text, "```"], "\n")], "\n")
+            let l:lines = join([a:text, join([l:yanked_text], "\n")], "\n")
+        else
+            let l:lines = a:text
+        endif
+    else
+            let l:lines = a:text
+    endif
+    
     
     
     if !exists('s:job') || s:job_status(s:job) !=# 'run'
@@ -251,6 +261,7 @@ function! gpt#send(text, model) abort
     let l:role = get(g:, "chatgpt_role", "")
     let l:model = empty(a:model) ? g:model : a:model
 
+    call s:print(json_encode({'eof': 0, 'error': '', 'text': printf(">>> %s\n>>>\n", l:lines), 'notification': ''}))
     call s:send_raw(l:ch, printf("%s\n", json_encode({'model': l:model, 'text': l:lines, 'role': l:role, "session": "chat"})))
 endfunction
 
